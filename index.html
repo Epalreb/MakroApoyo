@@ -129,12 +129,36 @@
                 resultDiv.innerHTML = `<div class="dni-ruc-display">${dniRuc}</div>
                                        <h2>¡Bienvenido!</h2>
                                        <p>Nombre: ${cliente["Nombre/Razon Social"]}</p>
-                                       <p>Local: ${cliente["Nombre_Local"]}</p> <!-- Mostrar Nombre Local -->
+                                       <p>Local: ${cliente["Nombre_Local"]}</p>
                                        <p>Fecha: ${fechaActual}</p>
                                        <p>Hora: ${horaActual}</p>
-                                       <p class="footer-message">Mostrar esta imagen en el lineal de cajas</p>`; // Mensaje en la segunda pantalla
+                                       <p class="footer-message">Mostrar esta imagen en el lineal de cajas</p>`;
+
+                // Enviar datos a Google Sheets
+                const dataToSend = {
+                    dniRuc: dniRuc,
+                    nombreLocal: cliente["Nombre_Local"],
+                    fecha: fechaActual,
+                    hora: horaActual
+                };
+
+                // URL del Google Script desplegado
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbyW0r-hE5OWHjqJKhMEkfMfW0AGTb9Jgmh039HhkoNeNwkv6tdL26orq42jBJzeuNtiug/exec';
+
+                // Enviar datos a la hoja de cálculo
+                fetch(scriptURL, {
+                    method: 'POST',
+                    body: new URLSearchParams(dataToSend), // Enviar como parámetros URL
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => console.log('Success:', data))
+                .catch((error) => console.error('Error:', error));
+
             } else {
-                resultDiv.innerHTML = `<p style="color: red;">DNI / RUC no encontrado. Consulte en atención al cliente.</p>`;
+                resultDiv.innerHTML = `<p style="color: red;">ID Titular no encontrado. Intenta de nuevo.</p>`;
             }
         }
     </script>
