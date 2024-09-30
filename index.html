@@ -130,7 +130,7 @@
                 const dataToSend = {
                     dniRuc: dniRuc,
                     nombreLocal: cliente["Nombre_Local"],
-                    nombreRazonSocial: cliente["Nombre/Razon Social"], // Agregando el nombre/razón social
+                    nombreRazonSocial: cliente["Nombre/Razon Social"], // Asegúrate de que este campo está enviando correctamente
                     fecha: fechaActual,
                     hora: horaActual,
                 };
@@ -145,8 +145,12 @@
                     }
                 })
                 .then(response => response.json())
-                .then(data => console.log('Success:', data))
-                .catch((error) => console.error('Error:', error));
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
 
             } else {
                 resultDiv.innerHTML = `<p style="color: red;">Documento no encontrado. Consulte en SAC.</p>`;
@@ -155,3 +159,4 @@
     </script>
 </body>
 </html>
+
