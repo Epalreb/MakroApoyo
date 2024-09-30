@@ -22,7 +22,6 @@
             flex-direction: column;
         }
 
-        /* Estilo para el recuadro */
         .card {
             background-color: rgba(0, 0, 0, 0.7); /* Fondo negro translúcido */
             padding: 40px;
@@ -73,7 +72,6 @@
             font-size: 1.2em;
         }
 
-        /* Estilo para mostrar el DNI o RUC en la segunda pantalla */
         .dni-ruc-display {
             font-weight: bold;
             font-size: 1.5em;
@@ -81,7 +79,6 @@
             color: #f2d01b; /* Color amarillo */
         }
 
-        /* Estilo para el mensaje al final */
         .footer-message {
             font-size: 0.8em; /* Tamaño más pequeño */
             margin-top: 20px;
@@ -101,17 +98,15 @@
     </div>
 
     <script>
-        // Función que carga el archivo JSON
         async function loadClientes() {
             const response = await fetch('clientes.json');
             const data = await response.json();
             return data;
         }
 
-        // Función que valida el DNI o RUC con la columna "ID Titular"
         async function solicitarMakroApoyo() {
             const dniRuc = document.getElementById('dniRuc').value;
-            const clientes = await loadClientes(); // Cargar la lista de clientes desde el archivo JSON
+            const clientes = await loadClientes();
             const cliente = clientes.find(c => c["ID Titular"] == dniRuc);
 
             const resultDiv = document.getElementById('result');
@@ -120,12 +115,10 @@
                 const fechaActual = new Date().toLocaleDateString('es-ES');
                 const horaActual = new Date().toLocaleTimeString('es-ES');
                 
-                // Ocultar el campo de entrada, el botón y el texto de introducción
                 document.getElementById('dniRuc').style.display = 'none';
                 document.getElementById('btnSolicitar').style.display = 'none';
-                document.getElementById('introText').style.display = 'none'; // Ocultar el texto de introducción
-                
-                // Mostrar el DNI o RUC en el formato de solo lectura
+                document.getElementById('introText').style.display = 'none';
+
                 resultDiv.innerHTML = `<div class="dni-ruc-display">${dniRuc}</div>
                                        <h2>¡Bienvenido!</h2>
                                        <p>Nombre: ${cliente["Nombre/Razon Social"]}</p>
@@ -134,31 +127,25 @@
                                        <p>Hora: ${horaActual}</p>
                                        <p class="footer-message">Mostrar esta imagen en el lineal de cajas</p>`;
 
-                // Enviar datos a Google Sheets
                 const dataToSend = {
                     dniRuc: dniRuc,
                     nombreLocal: cliente["Nombre_Local"],
-                    nombreRazonSocial: cliente["Nombre/Razon Social"], // Nuevo campo para el nombre/razón social
+                    nombreRazonSocial: cliente["Nombre/Razon Social"], // Agregando el nombre/razón social
                     fecha: fechaActual,
                     hora: horaActual,
                 };
 
-                // URL del Google Script desplegado
-                const scriptURL = 'https://script.google.com/macros/s/AKfycbyW0r-hE5OWHjqJKhMEkfMfW0AGTb9Jgmh039HhkoNeNwkv6tdL26orq42jBJzeuNtiug/exec';
+                const scriptURL = 'https://script.google.com/macros/s/AKfycby8QCuC-2fCNQNDZ_7MjeQZwTtVxqNWm8139PgRXHMUKsCAT4DWwYW2Kft4WeV1g4AJ/exec';
 
-                // Enviar datos a la hoja de cálculo
                 fetch(scriptURL, {
                     method: 'POST',
-                    body: new URLSearchParams(dataToSend), // Enviar como parámetros URL
+                    body: new URLSearchParams(dataToSend),
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     }
                 })
                 .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    resultDiv.innerHTML += '<p>Datos guardados correctamente en la hoja de cálculo.</p>';
-                })
+                .then(data => console.log('Success:', data))
                 .catch((error) => console.error('Error:', error));
 
             } else {
@@ -168,3 +155,4 @@
     </script>
 </body>
 </html>
+
