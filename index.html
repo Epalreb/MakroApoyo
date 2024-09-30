@@ -138,24 +138,34 @@
                 const dataToSend = {
                     dniRuc: dniRuc,
                     nombreLocal: cliente["Nombre_Local"],
+                    razonSocial: cliente["Nombre/Razon Social"],
                     fecha: fechaActual,
-                    hora: horaActual
+                    hora: horaActual,
+                    mainGroup: cliente["MainGroup"] || '' // Usar el valor de MainGroup si existe
                 };
 
                 // URL del Google Script desplegado
                 const scriptURL = 'https://script.google.com/macros/s/AKfycbyW0r-hE5OWHjqJKhMEkfMfW0AGTb9Jgmh039HhkoNeNwkv6tdL26orq42jBJzeuNtiug/exec';
 
                 // Enviar datos a la hoja de cálculo
-                fetch(scriptURL, {
-                    method: 'POST',
-                    body: new URLSearchParams(dataToSend), // Enviar como parámetros URL
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                try {
+                    const response = await fetch(scriptURL, {
+                        method: 'POST',
+                        body: JSON.stringify(dataToSend),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+                    if (result.result === 'success') {
+                        console.log(`Datos guardados en la fila: ${result.row}`);
+                    } else {
+                        console.error('Error al guardar los datos:', result.error);
                     }
-                })
-                .then(response => response.json())
-                .then(data => console.log('Success:', data))
-                .catch((error) => console.error('Error:', error));
+                } catch (error) {
+                    console.error('Error en la solicitud:', error);
+                }
 
             } else {
                 resultDiv.innerHTML = `<p style="color: red;">ID Titular no encontrado. Intenta de nuevo.</p>`;
@@ -164,4 +174,3 @@
     </script>
 </body>
 </html>
-
