@@ -95,9 +95,6 @@
             <h1>Servicio MakroApoyo</h1>
             <p id="introText">¡Bienvenido! Ingresa tu DNI o RUC para continuar:</p>
             <input type="text" id="dniRuc" placeholder="Ingresa tu DNI o RUC">
-            <div id="clientInfo" style="display: none;">
-                <input type="text" id="nombreRazonSocial" placeholder="Ingresa Nombre/Razón Social">
-            </div>
             <button class="btn-solicitar" id="btnSolicitar" onclick="solicitarMakroApoyo()">Solicitar MakroApoyo</button>
             <div id="result"></div> <!-- Aquí se mostrará el resultado -->
         </div>
@@ -120,56 +117,49 @@
             const resultDiv = document.getElementById('result');
 
             if (cliente) {
-                // Mostrar campo para Nombre/Razón Social
-                document.getElementById('clientInfo').style.display = 'block';
+                const fechaActual = new Date().toLocaleDateString('es-ES');
+                const horaActual = new Date().toLocaleTimeString('es-ES');
                 
                 // Ocultar el campo de entrada, el botón y el texto de introducción
                 document.getElementById('dniRuc').style.display = 'none';
                 document.getElementById('btnSolicitar').style.display = 'none';
                 document.getElementById('introText').style.display = 'none'; // Ocultar el texto de introducción
-
-                // Agregar el mensaje de bienvenida y los detalles del cliente
+                
+                // Mostrar el DNI o RUC en el formato de solo lectura
                 resultDiv.innerHTML = `<div class="dni-ruc-display">${dniRuc}</div>
                                        <h2>¡Bienvenido!</h2>
                                        <p>Nombre: ${cliente["Nombre/Razon Social"]}</p>
                                        <p>Local: ${cliente["Nombre_Local"]}</p>
-                                       <p>Por favor, completa el siguiente campo:</p>
-                                       <input type="text" id="nombreRazonSocial" placeholder="Ingresa Nombre/Razón Social">`;
+                                       <p>Fecha: ${fechaActual}</p>
+                                       <p>Hora: ${horaActual}</p>
+                                       <p class="footer-message">Mostrar esta imagen en el lineal de cajas</p>`;
 
                 // Enviar datos a Google Sheets
-                document.getElementById('btnSolicitar').style.display = 'block'; // Mostrar el botón para enviar datos
-
-                document.getElementById('btnSolicitar').onclick = () => {
-                    const nombreRazonSocial = document.getElementById('nombreRazonSocial').value;
-                    const fechaActual = new Date().toLocaleDateString('es-ES');
-                    const horaActual = new Date().toLocaleTimeString('es-ES');
-
-                    const dataToSend = {
-                        dniRuc: dniRuc,
-                        nombreRazonSocial: nombreRazonSocial, // Nuevo campo agregado
-                        nombreLocal: cliente["Nombre_Local"],
-                        fecha: fechaActual,
-                        hora: horaActual,
-                    };
-
-                    // URL del Google Script desplegado
-                    const scriptURL = 'https://script.google.com/macros/s/AKfycbyW0r-hE5OWHjqJKhMEkfMfW0AGTb9Jgmh039HhkoNeNwkv6tdL26orq42jBJzeuNtiug/exec';
-
-                    // Enviar datos a la hoja de cálculo
-                    fetch(scriptURL, {
-                        method: 'POST',
-                        body: new URLSearchParams(dataToSend), // Enviar como parámetros URL
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Success:', data);
-                        resultDiv.innerHTML += '<p>Datos guardados correctamente en la hoja de cálculo.</p>';
-                    })
-                    .catch((error) => console.error('Error:', error));
+                const dataToSend = {
+                    dniRuc: dniRuc,
+                    nombreLocal: cliente["Nombre_Local"],
+                    nombreRazonSocial: cliente["Nombre/Razon Social"], // Nuevo campo para el nombre/razón social
+                    fecha: fechaActual,
+                    hora: horaActual,
                 };
+
+                // URL del Google Script desplegado
+                const scriptURL = 'https://script.google.com/macros/s/AKfycbyW0r-hE5OWHjqJKhMEkfMfW0AGTb9Jgmh039HhkoNeNwkv6tdL26orq42jBJzeuNtiug/exec';
+
+                // Enviar datos a la hoja de cálculo
+                fetch(scriptURL, {
+                    method: 'POST',
+                    body: new URLSearchParams(dataToSend), // Enviar como parámetros URL
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    resultDiv.innerHTML += '<p>Datos guardados correctamente en la hoja de cálculo.</p>';
+                })
+                .catch((error) => console.error('Error:', error));
 
             } else {
                 resultDiv.innerHTML = `<p style="color: red;">Documento no encontrado. Consulte en SAC.</p>`;
@@ -178,4 +168,3 @@
     </script>
 </body>
 </html>
-
