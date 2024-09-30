@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicio MakroApoyo</title>
+    <style>
+        body {
+            background-color: #0427a8; /* Fondo azul */
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Estilo para el recuadro */
+        .card {
+            background-color: rgba(0, 0, 0, 0.7); /* Fondo negro translúcido */
+            padding: 40px;
+            border-radius: 15px; /* Bordes redondeados */
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5); /* Sombra */
+            width: 300px; /* Ancho fijo */
+            text-align: center; /* Alineación centrada */
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #f2d01b; /* Título amarillo */
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1em;
+            margin-top: 20px;
+            width: 100%; /* Ajustar el campo de texto al ancho del recuadro */
+            border-radius: 5px;
+            border: none;
+        }
+
+        .btn-solicitar {
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #c93822; /* Botón rojo */
+            color: white;
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 5px; /* Bordes redondeados en el botón */
+            width: 100%; /* Ajustar el botón al ancho del recuadro */
+        }
+
+        .btn-solicitar:hover {
+            background-color: #0751e8; /* Hover azul claro */
+        }
+
+        #result {
+            margin-top: 40px;
+            font-size: 1.2em;
+        }
+
+        /* Estilo para mostrar el DNI o RUC en la segunda pantalla */
+        .dni-ruc-display {
+            font-weight: bold;
+            font-size: 1.5em;
+            margin-top: 20px;
+            color: #f2d01b; /* Color amarillo */
+        }
+
+        /* Estilo para el mensaje al final */
+        .footer-message {
+            font-size: 0.8em; /* Tamaño más pequeño */
+            margin-top: 20px;
+            color: #f9e03b; /* Color amarillo brillante para resaltar */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Servicio MakroApoyo</h1>
+            <p id="introText">¡Bienvenido! Ingresa tu DNI o RUC para continuar:</p>
+            <input type="text" id="dniRuc" placeholder="Ingresa tu DNI o RUC">
+            <button class="btn-solicitar" id="btnSolicitar" onclick="solicitarMakroApoyo()">Solicitar MakroApoyo</button>
+            <div id="result"></div> <!-- Aquí se mostrará el resultado -->
+        </div>
+    </div>
+
+    <script>
+        // Función que carga el archivo JSON
+        async function loadClientes() {
+            const response = await fetch('clientes.json');
+            const data = await response.json();
+            return data;
+        }
+
+        // Función que valida el DNI o RUC con la columna "ID Titular"
+        async function solicitarMakroApoyo() {
+            const dniRuc = document.getElementById('dniRuc').value;
+            const clientes = await loadClientes(); // Cargar la lista de clientes desde el archivo JSON
+            const cliente = clientes.find(c => c["ID Titular"] == dniRuc);
+
+            const resultDiv = document.getElementById('result');
+
+            if (cliente) {
+                const fechaActual = new Date().toLocaleDateString('es-ES');
+                const horaActual = new Date().toLocaleTimeString('es-ES');
+                
+                // Ocultar el campo de entrada, el botón y el texto de introducción
+                document.getElementById('dniRuc').style.display = 'none';
+                document.getElementById('btnSolicitar').style.display = 'none';
+                document.getElementById('introText').style.display = 'none'; // Ocultar el texto de introducción
+                
+                // Mostrar el DNI o RUC en el formato de solo lectura
+                resultDiv.innerHTML = `<div class="dni-ruc-display">${dniRuc}</div>
+                                       <h2>¡Bienvenido!</h2>
+                                       <p>Nombre: ${cliente["Nombre/Razon Social"]}</p>
+                                       <p>Local: ${cliente["Nombre_Local"]}</p> <!-- Mostrar Nombre Local -->
+                                       <p>Fecha: ${fechaActual}</p>
+                                       <p>Hora: ${horaActual}</p>
+                                       <p class="footer-message">Mostrar esta imagen en el lineal de cajas</p>`; // Mensaje en la segunda pantalla
+            } else {
+                resultDiv.innerHTML = `<p style="color: red;">ID Titular no encontrado. Intenta de nuevo.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
