@@ -107,14 +107,14 @@
         async function solicitarMakroApoyo() {
             const dniRuc = document.getElementById('dniRuc').value;
             const clientes = await loadClientes();
-            const cliente = clientes.find(c => c["ID Titular"].toString() === dniRuc); // Comparar como string
+            const cliente = clientes.find(c => c["ID Titular"] == dniRuc);
 
             const resultDiv = document.getElementById('result');
 
             if (cliente) {
                 const fechaActual = new Date().toLocaleDateString('es-ES');
                 const horaActual = new Date().toLocaleTimeString('es-ES');
-
+                
                 document.getElementById('dniRuc').style.display = 'none';
                 document.getElementById('btnSolicitar').style.display = 'none';
                 document.getElementById('introText').style.display = 'none';
@@ -130,7 +130,7 @@
                 const dataToSend = {
                     dniRuc: dniRuc,
                     nombreLocal: cliente["Nombre_Local"],
-                    nombreRazonSocial: cliente["Nombre/Razon Social"], // Asegúrate de que coincida con el nombre
+                    nombreRazonSocial: cliente["Nombre/Razon Social"], // Agregando el nombre/razón social
                     fecha: fechaActual,
                     hora: horaActual,
                 };
